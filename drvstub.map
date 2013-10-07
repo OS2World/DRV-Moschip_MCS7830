@@ -1,0 +1,450 @@
+LINK386 :  warning L4021: no stack segment
+
+ drvstub
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000152H _DATA                  16DATA 32-bit
+               at offset 00000000 00152H bytes from drvstub.obj (DRVSTUB.ASM)
+
+ 0002:00000000 000000CFAH _TEXT                  16CODE 16-bit
+               at offset 00000000 00CFAH bytes from drvstub.obj (DRVSTUB.ASM)
+
+ 0003:00000000 000005038H CODE32                 CODE 32-bit
+               at offset 00000000 0035BH bytes from drvstub.obj (DRVSTUB.ASM)
+               at offset 0000035b 024FFH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVSTUB1.obj (E:\SPRACHEN\VPC\OWN\Driver\DRVSTUB1.PAS)
+               at offset 0000285a 0004AH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@17)
+               at offset 000028a4 00029H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@18)
+               at offset 000028cd 0007FH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@22)
+               at offset 0000294c 00019H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@24)
+               at offset 00002965 0001EH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@29)
+               at offset 00002983 00018H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@31)
+               at offset 0000299b 0001FH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@32)
+               at offset 000029ba 00019H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@39)
+               at offset 000029d3 00012H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@40)
+               at offset 000029e5 0002AH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@44)
+               at offset 00002a0f 0005BH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@53)
+               at offset 00002a6a 0002CH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@54)
+               at offset 00002a96 00038H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@55)
+               at offset 00002ace 00037H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@60)
+               at offset 00002b05 00026H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@62)
+               at offset 00002b2b 0004EH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@69)
+               at offset 00002b79 00065H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@73)
+               at offset 00002bde 000BAH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@74)
+               at offset 00002c98 0001EH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@76)
+               at offset 00002cb6 0000FH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@77)
+               at offset 00002cc5 000C7H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@78)
+               at offset 00002d8c 00067H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@79)
+               at offset 00002df3 0011FH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@80)
+               at offset 00002f12 00036H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@56)
+               at offset 00002f48 00019H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@67)
+               at offset 00002f61 00021H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@68)
+               at offset 00002f82 00025H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@70)
+               at offset 00002fa7 000BDH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE.lib (RMBASE@1)
+               at offset 00003064 0004AH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE.lib (RMBASE@2)
+               at offset 000030ae 000C5H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE.lib (RMBASE@3)
+               at offset 00003173 00006H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE.lib (RMBASE@4)
+               at offset 00003179 00501H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@0)
+               at offset 0000367a 0007FH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@1)
+               at offset 000036f9 000EBH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@2)
+               at offset 000037e4 00181H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@3)
+               at offset 00003965 00056H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@4)
+               at offset 000039bb 000D3H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@5)
+               at offset 00003a8e 001EBH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@6)
+               at offset 00003c79 0007CH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@7)
+               at offset 00003cf5 00034H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@8)
+               at offset 00003d29 0008AH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@9)
+               at offset 00003db3 0011DH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@10)
+               at offset 00003ed0 0003EH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@11)
+               at offset 00003f0e 00090H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@12)
+               at offset 00003f9e 0007AH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@13)
+               at offset 00004018 00036H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@1)
+               at offset 0000404e 000A4H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@2)
+               at offset 000040f2 0003CH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@3)
+               at offset 0000412e 0016DH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@4)
+               at offset 0000429b 00050H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@5)
+               at offset 000042eb 00264H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@6)
+               at offset 0000454f 0010CH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@7)
+               at offset 0000465b 00100H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@9)
+               at offset 0000475b 00056H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@11)
+               at offset 000047b1 00036H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@12)
+               at offset 000047e7 00037H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@13)
+               at offset 0000481e 000DCH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@14)
+               at offset 000048fa 00114H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@15)
+               at offset 00004a0e 00114H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@16)
+               at offset 00004b22 00137H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@18)
+               at offset 00004c59 00148H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@8)
+               at offset 00004da1 000E6H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@10)
+               at offset 00004e87 00012H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@16)
+               at offset 00004e99 00050H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@25)
+               at offset 00004ee9 00021H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@28)
+               at offset 00004f0a 00016H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@30)
+               at offset 00004f20 00017H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@41)
+               at offset 00004f37 00029H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@42)
+               at offset 00004f60 00029H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@45)
+               at offset 00004f89 0001DH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@46)
+               at offset 00004fa6 00017H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@50)
+               at offset 00004fbd 00018H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@51)
+               at offset 00004fd5 00038H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@52)
+               at offset 0000500d 0002BH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@58)
+
+ 0004:00000000 000000018H DATA32                 DATA 32-bit
+               at offset 00000000 00008H bytes from drvstub.obj (DRVSTUB.ASM)
+               at offset 00000008 00010H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@72)
+
+ 0004:00000018 0000007C4H CONST32                CONST 32-bit
+               at offset 00000000 006BDH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVSTUB1.obj (E:\SPRACHEN\VPC\OWN\Driver\DRVSTUB1.PAS)
+               at offset 000006c0 00009H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE.lib (RMBASE@1)
+               at offset 000006cc 00052H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@0)
+               at offset 00000720 00009H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE.lib (MACBASE@1)
+               at offset 0000072c 00009H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@1)
+               at offset 00000738 00014H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@7)
+               at offset 0000074c 0000DH bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@9)
+               at offset 0000075c 00014H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@15)
+               at offset 00000770 00014H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@16)
+               at offset 00000784 00030H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@8)
+               at offset 000007b4 00010H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@10)
+
+ 0004:000007DC 000000000H TLS                    TLS 32-bit
+ 0004:000007DC 0000005CEH BSS32                  BSS 32-bit
+               at offset 00000000 00591H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVSTUB1.obj (E:\SPRACHEN\VPC\OWN\Driver\DRVSTUB1.PAS)
+               at offset 00000591 00009H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE.lib (DRVBASE@75)
+               at offset 0000059a 00014H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE.lib (RMBASE@0)
+               at offset 000005ae 00020H bytes from E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE.lib (USBBASE@0)
+
+
+ Origin   Group
+ 0000:0   FLAT
+ 0004:0   DGROUP
+ 0001:0   DGROUP1
+
+  Address         Publics by Name
+
+ 0002:00000262       ArmCtxHook
+ 0002:00000493       AttachDD
+ 0003:000000B7       CallD32
+ 0002:000004D4       CallDDD16
+ 0002:000004C9       CallDDD32
+ 0003:000000AA       CallI32
+ 0003:000000C5       CallM32
+ 0003:00000087       CallS32
+ 0002:0000092C       CallStr
+ 0002:000006B5       Context
+ 0003:000002A4       CreateContextThread
+ 0003:0000001E       CtxThMain
+ 0003:00000012       CtxThSt1
+ 0003:00000018       CtxThSt2
+ 0002:00000418       DevDone
+ 0002:000001FB       DevHlp16
+ 0000:00000000  Imp  Dos16Write           (DOSCALLS.138)
+ 0000:00000000  Imp  Dos32CreateThread    (DOSCALLS.311)
+ 0000:00000000  Imp  Dos32Exit            (DOSCALLS.234)
+ 0000:00000000  Imp  Dos32SetPriority     (DOSCALLS.236)
+ 0002:000000E6       DosDevIOCtl
+ 0002:000009AD       DosIO
+ 0002:000000DF       DosNI
+ 0003:00002B79       DRVBASE@BytesToHex
+ 0003:0000299B       DRVBASE@DevAllocGDTSelector
+ 0003:00004FA6       DRVBASE@DevAllocReqPacket
+ 0003:00002965       DRVBASE@DevArmCtxHook
+ 0003:00004F20       DRVBASE@DevAttachDD
+ 0003:00004F37       DRVBASE@DevCallDD16
+ 0003:00004FD5       DRVBASE@DevDevIOCtl
+ 0003:0000294C       DRVBASE@DevFreeMem
+ 0003:00004FBD       DRVBASE@DevFreeReqPacket
+ 0003:000028A4       DRVBASE@DevGetGlobalInfo
+ 0003:000028CD       DRVBASE@DevGetMemPhys
+ 0003:000000D7       DRVBASE@DevHlp32
+ 0003:00004EE9       DRVBASE@DevLinToGDTSelector
+ 0003:00002983       DRVBASE@DevLinToVirt
+ 0003:00004E99       DRVBASE@DevMapPhys
+ 0003:000029D3       DRVBASE@DevResetTimer
+ 0003:00004F89       DRVBASE@DevSemClear
+ 0003:00004F60       DRVBASE@DevSemRequest
+ 0003:000029E5       DRVBASE@DevSetOptions
+ 0003:000001D5       DRVBASE@DevSleep
+ 0003:00000172       DRVBASE@DevTCYield
+ 0003:000029BA       DRVBASE@DevTickCount
+ 0003:0000285A       DRVBASE@DevVirtToLin
+ 0003:00000123       DRVBASE@DevYield
+ 0003:00004F0A       DRVBASE@GetCallInAddr
+ 0003:000000EA       DRVBASE@GetGDTSelInf32
+ 0003:00002DF3       DRVBASE@GetParam
+ 0003:00002BDE       DRVBASE@HexToBytes
+ 0003:00002CC5       DRVBASE@InfAdd
+ 0004:00000008       DRVBASE@InfASCII
+ 0004:00000D6D       DRVBASE@InfBuff
+ 0004:00000D71       DRVBASE@InfBuffSize
+ 0003:00002D8C       DRVBASE@InfCopy
+ 0003:00002C98       DRVBASE@InfInit
+ 0004:00000D75       DRVBASE@InfLog
+ 0003:00002CB6       DRVBASE@InfSet
+ 0003:00004E87       DRVBASE@LocToDat16
+ 0003:000001C1       DRVBASE@LocToDat32
+ 0003:00002A6A       DRVBASE@MemFill
+ 0003:00002A0F       DRVBASE@MemMove
+ 0003:0000500D       DRVBASE@StrCopy
+ 0003:00002F12       DRVBASE@StrEnd
+ 0003:00002B05       DRVBASE@StrLCat
+ 0003:00002ACE       DRVBASE@StrLCopy
+ 0003:00002A96       DRVBASE@StrLen
+ 0003:00002B2B       DRVBASE@StrPos
+ 0003:00002F61       DRVBASE@StrRScan
+ 0003:00002F48       DRVBASE@StrScan
+ 0003:00002F82       DRVBASE@StrUpper
+ 0004:000007DC       DRVSTUB1@Bss@
+ 0003:0000035B       DRVSTUB1@Code@
+ 0004:00000018       DRVSTUB1@Const@
+ 0003:000018A9       DRVSTUB1@Context
+ 0004:00000008       DRVSTUB1@Data@
+ 0003:000014EA       DRVSTUB1@IDCEntry
+ 0003:00002082       DRVSTUB1@Interrupt
+ 0003:00002449       DRVSTUB1@MACEntry
+ 0003:00001444       DRVSTUB1@Strategy
+ 0004:000007DC       DRVSTUB1@Tls@
+ 0002:000009A5       Error
+ 0002:00000221       GetCallIn
+ 0002:00000000       GetSelInf
+ 0002:000007E1       IDC_Main
+ 0002:000007BA       IDC_None
+ 0002:00000781       IDC_Reg
+ 0002:00000A6A       Init
+ 0003:000001FB       InitContextThread
+ 0002:000007ED       Intr
+ 0002:000009F7       IOCtl
+ 0002:00000075       LinToVirt
+ 0003:00003C79       MACBASE@MACAdapterCheck
+ 0003:000036F9       MACBASE@MACBind
+ 0003:00003A8E       MACBASE@MACDefGenReq
+ 0003:00003F9E       MACBASE@MACIndicateIRQ
+ 0003:00003F0E       MACBASE@MACIndicateResetStatus
+ 0003:00003ED0       MACBASE@MACIndicationComplete
+ 0003:00003179       MACBASE@MACInit
+ 0003:00003D29       MACBASE@MACReciveLookahead
+ 0003:0000367A       MACBASE@MACRegister
+ 0003:00003CF5       MACBASE@MACSetIndication
+ 0003:000039BB       MACBASE@MACTestFilter
+ 0003:00003DB3       MACBASE@MACTransferData
+ 0003:00003965       MACBASE@MACTransmitConfirm
+ 0003:000037E4       MACBASE@MACXmitChainPrep
+ 0002:0000087F       MACCall
+ 0002:00000847       MACCall0
+ 0002:0000084F       MACCall1
+ 0002:00000857       MACCall2
+ 0002:0000085F       MACCall3
+ 0002:00000867       MACCall4
+ 0002:0000086F       MACCall5
+ 0002:00000877       MACCall6
+ 0002:0000030E       Memory
+ 0003:00000050       PrepGDT
+ 0002:00000C6A       PrintMSG
+ 0002:000003A0       ReqQueue
+ 0002:0000057C       RESMGR1
+ 0002:00000595       RESMGR2
+ 0004:00000D86       RMBASE@AdpHandle
+ 0004:00000D82       RMBASE@DrvHandle
+ 0003:00003064       RMBASE@RMCancel
+ 0003:000030AE       RMBASE@RMCreateAdapter
+ 0003:00003173       RMBASE@RMGetLastAdapterHandle
+ 0004:00000D76       RMBASE@RMIDC
+ 0003:00002FA7       RMBASE@RMInit
+ 0003:000002CB       RunThread
+ 0002:0000042C       SetIRQ
+ 0002:000005DF       SetOptions
+ 0002:00000464       SetTimer
+ 0002:0000069C       Strat
+ 0002:00000821       Timer
+ 0004:00000DA2       USBBASE@GenSem
+ 0004:00000DA6       USBBASE@GenSem16
+ 0004:00000D96       USBBASE@MYIDC
+ 0003:0000412E       USBBASE@USBAttach
+ 0003:000040F2       USBBASE@USBCheckIDC
+ 0003:00004C59       USBBASE@USBClearStalledPipe
+ 0003:0000429B       USBBASE@USBDetachGetNr
+ 0003:0000475B       USBBASE@USBGetDataAddr
+ 0003:000047B1       USBBASE@USBGetDataLastLen
+ 0003:000047E7       USBBASE@USBGetDataStatus
+ 0003:0000481E       USBBASE@USBGetString
+ 0003:00004B22       USBBASE@USBHandleIRQ
+ 0004:00000D8A       USBBASE@USBIDC
+ 0003:00004018       USBBASE@USBInit
+ 0003:0000454F       USBBASE@USBIssueControlRequest
+ 0003:000048FA       USBBASE@USBIssueDataRequest
+ 0003:00004A0E       USBBASE@USBIssueDataRequestP
+ 0003:0000404E       USBBASE@USBLink
+ 0003:0000465B       USBBASE@USBSetConfig
+ 0003:00004DA1       USBBASE@USBSetInterface
+ 0003:000042EB       USBBASE@USBSetupPipes
+ 0002:00000740       _IDC_Stk
+
+  Address         Publics by Value
+
+ 0000:00000000  Imp  Dos32CreateThread    (DOSCALLS.311)
+ 0000:00000000  Imp  Dos16Write           (DOSCALLS.138)
+ 0000:00000000  Imp  Dos32SetPriority     (DOSCALLS.236)
+ 0000:00000000  Imp  Dos32Exit            (DOSCALLS.234)
+ 0002:00000000       GetSelInf
+ 0002:00000075       LinToVirt
+ 0002:000000DF       DosNI
+ 0002:000000E6       DosDevIOCtl
+ 0002:000001FB       DevHlp16
+ 0002:00000221       GetCallIn
+ 0002:00000262       ArmCtxHook
+ 0002:0000030E       Memory
+ 0002:000003A0       ReqQueue
+ 0002:00000418       DevDone
+ 0002:0000042C       SetIRQ
+ 0002:00000464       SetTimer
+ 0002:00000493       AttachDD
+ 0002:000004C9       CallDDD32
+ 0002:000004D4       CallDDD16
+ 0002:0000057C       RESMGR1
+ 0002:00000595       RESMGR2
+ 0002:000005DF       SetOptions
+ 0002:0000069C       Strat
+ 0002:000006B5       Context
+ 0002:00000740       _IDC_Stk
+ 0002:00000781       IDC_Reg
+ 0002:000007BA       IDC_None
+ 0002:000007E1       IDC_Main
+ 0002:000007ED       Intr
+ 0002:00000821       Timer
+ 0002:00000847       MACCall0
+ 0002:0000084F       MACCall1
+ 0002:00000857       MACCall2
+ 0002:0000085F       MACCall3
+ 0002:00000867       MACCall4
+ 0002:0000086F       MACCall5
+ 0002:00000877       MACCall6
+ 0002:0000087F       MACCall
+ 0002:0000092C       CallStr
+ 0002:000009A5       Error
+ 0002:000009AD       DosIO
+ 0002:000009F7       IOCtl
+ 0002:00000A6A       Init
+ 0002:00000C6A       PrintMSG
+ 0003:00000012       CtxThSt1
+ 0003:00000018       CtxThSt2
+ 0003:0000001E       CtxThMain
+ 0003:00000050       PrepGDT
+ 0003:00000087       CallS32
+ 0003:000000AA       CallI32
+ 0003:000000B7       CallD32
+ 0003:000000C5       CallM32
+ 0003:000000D7       DRVBASE@DevHlp32
+ 0003:000000EA       DRVBASE@GetGDTSelInf32
+ 0003:00000123       DRVBASE@DevYield
+ 0003:00000172       DRVBASE@DevTCYield
+ 0003:000001C1       DRVBASE@LocToDat32
+ 0003:000001D5       DRVBASE@DevSleep
+ 0003:000001FB       InitContextThread
+ 0003:000002A4       CreateContextThread
+ 0003:000002CB       RunThread
+ 0003:0000035B       DRVSTUB1@Code@
+ 0003:00001444       DRVSTUB1@Strategy
+ 0003:000014EA       DRVSTUB1@IDCEntry
+ 0003:000018A9       DRVSTUB1@Context
+ 0003:00002082       DRVSTUB1@Interrupt
+ 0003:00002449       DRVSTUB1@MACEntry
+ 0003:0000285A       DRVBASE@DevVirtToLin
+ 0003:000028A4       DRVBASE@DevGetGlobalInfo
+ 0003:000028CD       DRVBASE@DevGetMemPhys
+ 0003:0000294C       DRVBASE@DevFreeMem
+ 0003:00002965       DRVBASE@DevArmCtxHook
+ 0003:00002983       DRVBASE@DevLinToVirt
+ 0003:0000299B       DRVBASE@DevAllocGDTSelector
+ 0003:000029BA       DRVBASE@DevTickCount
+ 0003:000029D3       DRVBASE@DevResetTimer
+ 0003:000029E5       DRVBASE@DevSetOptions
+ 0003:00002A0F       DRVBASE@MemMove
+ 0003:00002A6A       DRVBASE@MemFill
+ 0003:00002A96       DRVBASE@StrLen
+ 0003:00002ACE       DRVBASE@StrLCopy
+ 0003:00002B05       DRVBASE@StrLCat
+ 0003:00002B2B       DRVBASE@StrPos
+ 0003:00002B79       DRVBASE@BytesToHex
+ 0003:00002BDE       DRVBASE@HexToBytes
+ 0003:00002C98       DRVBASE@InfInit
+ 0003:00002CB6       DRVBASE@InfSet
+ 0003:00002CC5       DRVBASE@InfAdd
+ 0003:00002D8C       DRVBASE@InfCopy
+ 0003:00002DF3       DRVBASE@GetParam
+ 0003:00002F12       DRVBASE@StrEnd
+ 0003:00002F48       DRVBASE@StrScan
+ 0003:00002F61       DRVBASE@StrRScan
+ 0003:00002F82       DRVBASE@StrUpper
+ 0003:00002FA7       RMBASE@RMInit
+ 0003:00003064       RMBASE@RMCancel
+ 0003:000030AE       RMBASE@RMCreateAdapter
+ 0003:00003173       RMBASE@RMGetLastAdapterHandle
+ 0003:00003179       MACBASE@MACInit
+ 0003:0000367A       MACBASE@MACRegister
+ 0003:000036F9       MACBASE@MACBind
+ 0003:000037E4       MACBASE@MACXmitChainPrep
+ 0003:00003965       MACBASE@MACTransmitConfirm
+ 0003:000039BB       MACBASE@MACTestFilter
+ 0003:00003A8E       MACBASE@MACDefGenReq
+ 0003:00003C79       MACBASE@MACAdapterCheck
+ 0003:00003CF5       MACBASE@MACSetIndication
+ 0003:00003D29       MACBASE@MACReciveLookahead
+ 0003:00003DB3       MACBASE@MACTransferData
+ 0003:00003ED0       MACBASE@MACIndicationComplete
+ 0003:00003F0E       MACBASE@MACIndicateResetStatus
+ 0003:00003F9E       MACBASE@MACIndicateIRQ
+ 0003:00004018       USBBASE@USBInit
+ 0003:0000404E       USBBASE@USBLink
+ 0003:000040F2       USBBASE@USBCheckIDC
+ 0003:0000412E       USBBASE@USBAttach
+ 0003:0000429B       USBBASE@USBDetachGetNr
+ 0003:000042EB       USBBASE@USBSetupPipes
+ 0003:0000454F       USBBASE@USBIssueControlRequest
+ 0003:0000465B       USBBASE@USBSetConfig
+ 0003:0000475B       USBBASE@USBGetDataAddr
+ 0003:000047B1       USBBASE@USBGetDataLastLen
+ 0003:000047E7       USBBASE@USBGetDataStatus
+ 0003:0000481E       USBBASE@USBGetString
+ 0003:000048FA       USBBASE@USBIssueDataRequest
+ 0003:00004A0E       USBBASE@USBIssueDataRequestP
+ 0003:00004B22       USBBASE@USBHandleIRQ
+ 0003:00004C59       USBBASE@USBClearStalledPipe
+ 0003:00004DA1       USBBASE@USBSetInterface
+ 0003:00004E87       DRVBASE@LocToDat16
+ 0003:00004E99       DRVBASE@DevMapPhys
+ 0003:00004EE9       DRVBASE@DevLinToGDTSelector
+ 0003:00004F0A       DRVBASE@GetCallInAddr
+ 0003:00004F20       DRVBASE@DevAttachDD
+ 0003:00004F37       DRVBASE@DevCallDD16
+ 0003:00004F60       DRVBASE@DevSemRequest
+ 0003:00004F89       DRVBASE@DevSemClear
+ 0003:00004FA6       DRVBASE@DevAllocReqPacket
+ 0003:00004FBD       DRVBASE@DevFreeReqPacket
+ 0003:00004FD5       DRVBASE@DevDevIOCtl
+ 0003:0000500D       DRVBASE@StrCopy
+ 0004:00000008       DRVBASE@InfASCII
+ 0004:00000008       DRVSTUB1@Data@
+ 0004:00000018       DRVSTUB1@Const@
+ 0004:000007DC       DRVSTUB1@Bss@
+ 0004:000007DC       DRVSTUB1@Tls@
+ 0004:00000D6D       DRVBASE@InfBuff
+ 0004:00000D71       DRVBASE@InfBuffSize
+ 0004:00000D75       DRVBASE@InfLog
+ 0004:00000D76       RMBASE@RMIDC
+ 0004:00000D82       RMBASE@DrvHandle
+ 0004:00000D86       RMBASE@AdpHandle
+ 0004:00000D8A       USBBASE@USBIDC
+ 0004:00000D96       USBBASE@MYIDC
+ 0004:00000DA2       USBBASE@GenSem
+ 0004:00000DA6       USBBASE@GenSem16
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near A5 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 1FC in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 6C4 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 70F in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 751 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 78F in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 7C8 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 7EE in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 82A in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near 891 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near AC5 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near B73 in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near BBF in object _TEXT
+drvstub.obj(DRVSTUB.ASM) :  warning L4008: aliased fix-up to non-alias object near BDB in object _TEXT

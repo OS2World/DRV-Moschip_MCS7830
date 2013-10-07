@@ -1,0 +1,6 @@
+ALP DRVSTUB.ASM +Sfs | more
+pause
+link386 /E:2 /M:full /SE:10 /W drvstub E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVSTUB1, drvstub.sys,,os2386 E:\SPRACHEN\VPC\OUT.OS2\UNITS\DRVBASE E:\SPRACHEN\VPC\OUT.OS2\UNITS\RMBASE E:\SPRACHEN\VPC\OUT.OS2\UNITS\MACBASE E:\SPRACHEN\VPC\OUT.OS2\UNITS\USBBASE,drvstub | more
+mapsym drvstub.map
+COPY drvstub.sys D:\mcs7830.os2
+COPY drvstub.sym D:\mcs7830.sym
