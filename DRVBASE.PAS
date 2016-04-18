@@ -1,5 +1,5 @@
 {$B-,D+,H-,I-,J+,P-,Q-,R-,S-,T-,V+,W-,X+,Z-}
-{&AlignCode-,AlignData-,AlignRec-,Asm-,Cdecl-,Comments-,Delphi-,Frame-,G5+}
+{&AlignCode+,AlignData-,AlignRec-,Asm-,Cdecl-,Comments-,Delphi-,Frame-,G5+}
 {&LocInfo+,Open32-,Optimise+,OrgName-,SmartLink+,Speed+,Use32+,ZD-}
 {$M 32768}
 
@@ -1007,7 +1007,7 @@ asm
 end;
 
 FUNCTION DevSemRequest(Sem:Pointer16;Timeout:ULong):ApiRet;
-         assembler;  {&USES ebx,edi}
+         assembler;  {&USES ebx,edi,esi}
 asm
               MOV     EAX,Sem
               MOV     BX,AX

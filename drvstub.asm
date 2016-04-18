@@ -25,9 +25,10 @@
           EXTRN   DRVSTUB1@Interrupt:FAR
           EXTRN   DRVSTUB1@MACEntry:FAR
 
-.486P
+.686P
+.MMX
   DGROUP1  GROUP  _DATA
-  _DATA   SEGMENT WORD PUBLIC USE32 '16DATA'
+  _DATA   SEGMENT PARA PUBLIC USE32 '16DATA'
 
                                   ; device driver header...
   Header  DD      -1              ; link to next device driver
@@ -37,13 +38,22 @@
   H_Name  DB      'õõõõõõõõ'      ; logical device name
           DB      8 dup (0)       ; reserved
   H_Cap   DD      0013h           ; Capabilities Type 3
+
+          ALIGN 16
   DevHlp  DD      ?               ; DevHlp entry point
   PRPCode DD      0h              ; 32-Bit Linear PrepGDT Entry Point
   GateR0  DF      0h              ; 48-Bit Pointer To CallGate PrepGDT
+          DW      0h
   STRCode DF      0h              ; 48-Bit Linear Strategy Entry Point
+          DW      0h
   IRQCode DF      0h              ; 48-Bit Linear IRQ Entry Point
+          DW      0h
   IDCCode DF      0h              ; 48-Bit Linear IDC Entry Point
+          DW      0h
   MACCode DF      0h              ; 48-Bit Linear MAC Entry Point
+          DW   7777h              ; reserved
+
+          ALIGN 16
   DataLin DD      0h              ; FLAT Pointer to start of DATA32
   DataLen DD      0h              ; Length of DATA32
 PTKSSBase DD      0h              ; Pointer to TKSSBase KernelVar
@@ -66,15 +76,17 @@ CtxSemP16 DD      0h              ; Pointer 16 to CtxSem
           DD      0h              ; HookThread Ring3 EntyPoint
           DD      0h              ; secondary;
  GDT_Base DF      0h              ; Buffer for GDT-Register
+          DW      0h              ; Lock for GDT_Base
 IRQStruct DW      14              ; Number of bytes in structure, including itself.
 IRQ_flags DW      0h              ; IRQ-Routine does not change IRQ-Stats.
 IRQ_num   DW      10h             ; IRQ of interrupt handler that is being used
-IRQ_SkCLI DW      3072            ; bytes of stack used when interrupts disabled.
-IRQ_SkSTI DW      3072            ; bytes of stack used when interrupts enabled.
+IRQ_SkCLI DW      011FFh          ; bytes of stack used when interrupts disabled.
+IRQ_SkSTI DW      011FFh          ; bytes of stack used when interrupts enabled.
 IRQ_SkEOI DW      128             ; bytes of stack used after EOI.
 IRQ_Nest  DW      10              ; Maximum number of IRQ's pending
+
                                   ; Strategy routine dispatch table
-                                  ; for request packet command code...
+          ALIGN 16                ; for request packet command code...
   Dispch  DW      LOWWORD Init            ;00 0  = initialize driver
           DW      LOWWORD CallStr         ;01 1  = media check
           DW      LOWWORD CallStr         ;02 2  = build BIOS parameter block
@@ -137,7 +149,7 @@ LockDS    DD      ?
 
   _DATA   ENDS
 
-  _TEXT   SEGMENT BYTE PUBLIC USE16 '16CODE'
+  _TEXT   SEGMENT PARA PUBLIC USE16 '16CODE'
           ASSUME  CS:_TEXT,DS:DGROUP1,ES:NOTHING
 
 ;################################################################
@@ -151,7 +163,7 @@ LockDS    DD      ?
   ; OUT:  ECX=linear Base; EDX=Size
   ; USES: none
   ; If we have a GDT Selector, read it from Mem, else use DevHlp
-
+          ALIGN 16
 GetSelInf PROC    NEAR
           MOV     DX,AX             ; check for 0-pointer
           AND     DX,0FFF8h
@@ -165,11 +177,14 @@ GetSelInf PROC    NEAR
           PUSH    ESI               ; save ESI
           MOVZX   ESI,AX            ; get Selector in ESI
           MOV     EDX,OFFSET GDT_Base ; load GDT regs at GDT_Base
-          CMP     DWORD PTR [EDX+2],0h
-          JA      GDT_Ok
+          MOV     CX,-1             ; acquire lock
+    WAIT: XCHG    CX,[EDX+6]
+          OR      CX,CX
+          JNZ     WAIT
           SGDT    [EDX]
-  GDT_Ok: AND     ESI,0000FFF8h     ; mask RPL (for security)
+          AND     ESI,0000FFF8h     ; mask RPL (for security)
           ADD     ESI,[EDX+2]       ; build address of Selector in GDT
+          MOV     WORD PTR [EDX+6],0; free lock
           MOV     EDX,GS:[ESI+2]    ; load lower Base in EDX
           AND     EDX,000FFFFFFh
           MOV     ECX,GS:[ESI+4]    ; load higher Base in ECX
@@ -180,9 +195,11 @@ GetSelInf PROC    NEAR
           POP     ESI
           CLC                       ; signal no Error
           RET
+          ALIGN 8
      LDT: MOV     DL,05Dh         ; function GetDescInfo
           CALL    [DevHlp]        ; Call DevHelper,Result: ES starts at ECX
           RET
+          ALIGN 8
      Err: XOR     ECX,ECX
           XOR     EDX,EDX
           STC
@@ -194,7 +211,7 @@ GetSelInf ENDP
   ; Uses:   none
   ; can convert only data on data or stack segments!
   ; If data cannot be localized, carry ist set and a null-pointer is returned
-
+          ALIGN 16
 LinToVirt PROC
           PUSH    EBX               ; save EBX
           CMP     EAX, 0h           ; NIL?
@@ -212,6 +229,7 @@ LinToVirt PROC
           POP     EBX               ; get back EBX
           CLC                       ; clear C
           RET
+          ALIGN 8
    Stack: MOV     EAX,EBX           ; get clean copy of lin address
           MOV     EBX,PTKSSBase     ; get FLAT Pointer to TKSSBase
           CMP     EAX,GS:[EBX]      ; EAX < Start of STACK?
@@ -225,6 +243,7 @@ LinToVirt PROC
           POP     EBX               ; get back EBX
           CLC                       ; clear C
           RET
+          ALIGN 8
 NotFound: POP     EBX               ; get back EBX
           XOR     EAX,EAX
           MOV     ES,AX
@@ -243,12 +262,13 @@ LinToVirt ENDP
   ; IMPORTANT!
   ; If using DI to get params DI must be loeded from stack!!!!
   ;
-
+          ALIGN 16
     DosNI PROC    NEAR
           MOV     EAX,0001h        ; invalid Function
           RET
     DosNI ENDP
 
+          ALIGN 16
 DosDevIOCtl PROC NEAR
           PUSH    FS
           ENTER   0h,0h
@@ -276,6 +296,7 @@ DosDevIOCtl PROC NEAR
           MOV     EBX,GS:[EDI]      ; get first 4 bytes of name
           MOV     ECX,GS:[EDI+4]    ; get last 4 bytes of name
           JMP     Compare
+          ALIGN 8
     Loop: MOV     EAX,FS:[SI]       ; test next pointer
           CMP     EAX,0FFFFFFFFh
           JE      NEAR PTR Err      ; not found
@@ -315,8 +336,7 @@ DosDevIOCtl PROC NEAR
           MOV     ES:[DI],AL        ; correct size to 25 if ioctl1
   IoCtl2: PUSH    DS                ; save DS
           PUSH    CS                ; push CS on stack
-          MOV     AX,OFFSET Return  ; push offset for return on stack
-          PUSH    AX
+          PUSH    OFFSET Return     ; push offset for return on stack
           MOV     AX,FS:[SI+014h]   ; get driver DS
           MOV     DS,AX
           MOV     AX,FS:[SI+012h]   ; get driver CS
@@ -324,6 +344,7 @@ DosDevIOCtl PROC NEAR
           MOV     AX,FS:[SI+6]      ; get strat entry
           PUSH    AX
           RETF
+          ALIGN 8
   Return: POP     DS
           MOV     CX,ES:[BX+3]      ; get status
           CMP     CX,0100h          ; ok?
@@ -336,6 +357,7 @@ DosDevIOCtl PROC NEAR
           POP BP
           POP     FS
           RET
+          ALIGN 8
      Err: MOV     EAX,02h           ; set Error
           MOV     SP,BP
           POP BP
@@ -357,7 +379,7 @@ DosDevIOCtl ENDP
   ; These are directly driven by Wrappers in PASCAL.
   ; Only EAX comes from Stack, cause we need it to get
   ; 16-bit DS back.
-
+          ALIGN 16
  DevHlp16 PROC    FAR             ; 16-bit part for calling devhlp
           PUSH    SEG _DATA       ; get selector for _DATA
           POP     DS
@@ -367,6 +389,7 @@ DosDevIOCtl ENDP
           DB      066h            ; opcodes for RETF32
           DB      0CBh            ; (don't know how to tell alp)
           RET
+          ALIGN 16
  CallDos: SHR     DX,08h
           AND     DX,0000Fh
           SHL     DX,01h
@@ -379,6 +402,7 @@ DosDevIOCtl ENDP
           RET
  DevHlp16 ENDP
 
+          ALIGN 16
 GetCallIn PROC    NEAR
           MOV     AX,SEG _TEXT
           SHL     EAX,010h
@@ -386,35 +410,43 @@ GetCallIn PROC    NEAR
           JA      CallIn1
           MOV     AX,OFFSET MACCall0
           RET
+          ALIGN 8
  CallIn1: CMP     CX,1
           JA      CallIn2
           MOV     AX,OFFSET MACCall1
           RET
+          ALIGN 8
  CallIn2: CMP     CX,2
           JA      CallIn3
           MOV     AX,OFFSET MACCall2
           RET
+          ALIGN 8
  CallIn3: CMP     CX,3
           JA      CallIn4
           MOV     AX,OFFSET MACCall3
           RET
+          ALIGN 8
  CallIn4: CMP     CX,4
           JA      CallIn5
           MOV     AX,OFFSET MACCall4
           RET
+          ALIGN 8
  CallIn5: CMP     CX,5
           JA      CallIn6
           MOV     AX,OFFSET MACCall5
           RET
+          ALIGN 8
  CallIn6: MOV     AX,OFFSET MACCall6
           RET
 GetCallIn ENDP
 
+          ALIGN 16
 ArmCtxHook PROC NEAR
           AND     EBX,[CtxMask]  ; test if Hook available
           JNZ     Found
           MOV     AX,2            ; not available
           JMP     NEAR PTR Err
+          ALIGN 8
    Found: MOV     EDX,EBX         ; copy Mask
           AND     EDX,01h         ; test if ContextHook
           JZ      NotCtxHk
@@ -430,6 +462,7 @@ ArmCtxHook PROC NEAR
           Call    [DevHlp]
           JB      Err
           JMP     Leave
+          ALIGN 8
  NotCtxHk:MOV     EDX,EBX
           AND     EDX,02h         ; test if ContextThread 1
           JNZ     CT
@@ -438,6 +471,7 @@ ArmCtxHook PROC NEAR
           JNZ     CT
           MOV     AX,2
           JMP     Err
+          ALIGN 8
       CT: SHL     DX,1
           MOV     DI,DX
           MOV     EDX,[CtxReq+DI] ; get already set requests
@@ -453,12 +487,12 @@ ArmCtxHook PROC NEAR
           MOV     DX,07h             ; Sem Clear
           Call    [DevHlp]
           JB      Err
-          JMP     Leave
     Leave:XOR     EAX,EAX
     Err:  MOVZX   EAX,AX
           RET
 ArmCtxHook ENDP
 
+          ALIGN 16
    Memory PROC    NEAR
           CMP     BX,10
           JAE     ReqPkt          ; RequestPacket Functions
@@ -472,14 +506,19 @@ ArmCtxHook ENDP
           PUSH    AX
           POP     EAX
           RET
+
+          ALIGN 8
 NoFlToVirt: MOVZX   EDI,AX        ; alloc GDT Selector
           MOV     DX,02Dh
           CALL    [DevHlp]
           JB      Err
           XOR     EAX,EAX         ; ret OK
           RET
+          ALIGN 8
       Err:ADD     AX,BX           ; make nonzero return if not convert
           RET
+
+          ALIGN 16
 PhysToLin:MOVZX   EBX,AX
           SHR     EAX,010h
           PUSH    ES
@@ -492,9 +531,12 @@ PhysToLin:MOVZX   EBX,AX
           MOVZX   EAX,DI
           ADD     EAX,ECX
           RET
+          ALIGN 8
    MemErr:POP     ES
           XOR     EAX,EAX
           RET
+
+          ALIGN 16
    ReqPkt:CMP     BX,11
           JA      FreeReq
           SUB     BX,10           ; 10=wait, 11=nowait
@@ -508,9 +550,11 @@ PhysToLin:MOVZX   EBX,AX
           SHL     EAX,010h
           MOV     AX,BX
           RET
+          ALIGN 8
    RqErr: POP     ES
           XOR     EAX,EAX
           RET
+          ALIGN 16
   FreeReq:MOV     BX,AX
           SHR     EAX,010h
           PUSH    ES
@@ -521,9 +565,10 @@ PhysToLin:MOVZX   EBX,AX
           RET
    Memory ENDP
 
+          ALIGN 16
  ReqQueue PROC    NEAR
           CALL    LinToVirt       ; get queue-pointer
-          JB      Err
+          JB      NEAR PTR Err
           MOVZX   ESI,AX
           PUSH    FS
           PUSH    DS              ; copy DS to FS
@@ -536,10 +581,12 @@ PhysToLin:MOVZX   EBX,AX
           SHR     ECX,010h
           MOVZX   EBX,BX
           MOV     ES,CX
+          MOV     DWORD PTR ES:[BX+09h],00h ; make shure, QueueLink is 0!
           MOV     DX,09h          ; push req packet
           CALL    FS:[DevHlp]
           POP     FS
           RET
+          ALIGN 16
     Pull: CMP     ECX,1
           JNE     PullPart        ; test if ordinary pull
           MOV     DX,0Ah          ; pull request packet
@@ -550,6 +597,7 @@ PhysToLin:MOVZX   EBX,AX
           SHL     EAX,010h
           MOV     AX,BX           ; ret pointer16
           RET
+          ALIGN 16
 PullPart: MOV     ECX,EBX         ; get packet seg to ES
           SHR     ECX,010h
           MOVZX   EBX,BX
@@ -562,10 +610,12 @@ PullPart: MOV     ECX,EBX         ; get packet seg to ES
           SHL     EAX,010h
           MOV     AX,BX           ; ret pointer16
           RET
+          ALIGN 8
      Err: XOR     EAX,EAX
           RET
  ReqQueue ENDP
 
+          ALIGN 16
   DevDone PROC    NEAR            ; signal done
           MOV     ECX,EBX
           SHR     ECX,010h
@@ -575,26 +625,37 @@ PullPart: MOV     ECX,EBX         ; get packet seg to ES
           RET
   DevDone ENDP
 
+          ALIGN 16
    SetIRQ PROC    NEAR            ; set/unset IRQ
-          MOV     BX,DS:[IRQ_num] ; get IRQ
           CMP     AX,0h
           JE      Unset
-          MOV     AX,OFFSET Intr
+          MOV     AX,OFFSET Intr  ; store Code Offset
+          MOV     DS:[IRQ_num],BX ; store IRQ number
           MOV     DX,CX           ; copy shared flag
           MOV     DL,01Bh
           CALL    [DevHlp]
+          JB      Err
+          CMP     DH,1h           ; if shared, don't register stack usage
+          JE      OK
+          MOV     BX,OFFSET IRQStruct
+          MOV     DX,003Ah
+          CALL    [DevHlp]        ; register stack usage
           JNB     OK
-          MOVZX   EAX,AX
+   Err:   MOVZX   EAX,AX
           RET
-   Unset: MOV     DX,01Ch
+          ALIGN 8
+   Unset: MOV     BX,DS:[IRQ_num] ; get IRQ
+          MOV     DX,01Ch
           CALL    [DevHlp]
           JNB     OK
           MOV     EAX,01h
           RET
+          ALIGN 8
       OK: XOR     EAX,EAX
           RET
    SetIRQ ENDP
 
+          ALIGN 16
  SetTimer PROC    NEAR            ; set/unset timer hook
           CMP     AX,0h           ; check if unset request
           JE      Unset
@@ -604,16 +665,19 @@ PullPart: MOV     ECX,EBX         ; get packet seg to ES
           JNB     OK
           MOVZX   EAX,AX
           RET
+          ALIGN 8
    Unset: MOV     AX,OFFSET Timer
           MOV     DL,01Eh         ; Reset Timer
           CALL    [DevHlp]
           JNB     OK
           MOVZX   EAX,AX
           RET
+          ALIGN 8
       OK: XOR     EAX,EAX
           RET
  SetTimer ENDP
 
+          ALIGN 16
  AttachDD PROC    NEAR
           CALL    LinToVirt       ; get pointer to string
           JB      Err
@@ -635,10 +699,12 @@ PullPart: MOV     ECX,EBX         ; get packet seg to ES
           JB      Err
           XOR     EAX,EAX         ; OK
           RET
+          ALIGN 8
      Err: MOV     EAX,0073h       ; illegal address
           RET
  AttachDD ENDP
 
+          ALIGN 16
 CallDDD32 PROC    NEAR
           CALL    LinToVirt       ; get 16:16 pointer
           MOV     CX,ES           ; copy to CX:BX
@@ -647,9 +713,11 @@ CallDDD32 PROC    NEAR
           RET
 CallDDD32 ENDP
 
+          ALIGN 16
 CallDDD16 PROC    NEAR
           MOV     ES,CX           ; get param seg
           PUSH    GS              ; save segs
+          PUSH    FS
           PUSH    DS
           MOV     EAX,GS:[ESI+6]  ; IDC entry point
           CMP     EAX,0h          ; NIL?
@@ -673,9 +741,11 @@ CallDDD16 PROC    NEAR
           POP BP                  ; clenup
           POP     EDX
           POP     DS
+          POP     FS
           POP     GS
           MOVZX   EAX,AX
           RET
+          ALIGN 8
  CallRES: XOR     DI,DI           ; call resource-manager which
    Loop1: MOV     EAX,ES:[BX+DI]  ; uses this part of stack so
           CMP     EAX,0FFFFFFFFh  ; we need to copy params
@@ -693,6 +763,7 @@ CallDDD16 PROC    NEAR
           POP BP                  ; clenup
           POP     EDX
           POP     DS
+          POP     FS
           POP     GS
           MOVZX   EAX,AX
           RET
@@ -709,15 +780,19 @@ CallDDD16 PROC    NEAR
           POP BP                  ; clenup
           POP     EDX
           POP     DS
+          POP     FS
           POP     GS
           MOVZX   EAX,AX
           RET
+          ALIGN 8
 Failure0: POP     DS
+          POP     FS
           POP     GS
           MOV     EAX,0073h
           RET
 CallDDD16 ENDP
 
+          ALIGN 16
   RESMGR1 PROC    NEAR            ; call ressource-manager
           ENTER   4,0             ; does strange things on stack
           LEA     AX,[BP+6]       ; so exact stack struct is necessary
@@ -733,6 +808,7 @@ CallDDD16 ENDP
           RETF
   RESMGR1 ENDP
 
+          ALIGN 16
   RESMGR2 PROC    NEAR
           ENTER   2,0
           MOV     AX,GS:[ESI+8]   ; check if we can call resrgm dirctly
@@ -750,6 +826,7 @@ CallDDD16 ENDP
           MOV     SP,BP
           POP BP
           RETF                    ; return
+          ALIGN 8
    Ring0: PUSH    WORD PTR[BP+6]  ; direct call Ring 0
           PUSH    CS              ; uses copied params, so here we need
           PUSH    OFFSET Return   ; function number only
@@ -758,6 +835,7 @@ CallDDD16 ENDP
           RETF                    ; call resrgm
   RESMGR2 ENDP
 
+          ALIGN 16
 SetOptions PROC   NEAR
           MOV     [info],EBX      ; set info pointer
           MOV     EDX,GS:[ESI]    ; copy name
@@ -774,11 +852,13 @@ SetOptions PROC   NEAR
           MOV     DX,OFFSET IDC_None
           MOV     DS:[IDC_Ent],DX ; set entry point
           JMP     NoIDC
+          ALIGN 8
 NoIDCNone:CMP     AX,02h         ; is IDC with param in ES:BX?
           JNE     NoIDCReg
           MOV     DX,OFFSET IDC_Reg
           MOV     DS:[IDC_Ent],DX ; set entry point
           JMP     NoIDC
+          ALIGN 8
 NoIDCReg: MOV     DX,OFFSET IDC_Stk
           MOV     DS:[IDC_Ent],DX ; set entry point, params via stack
    NoIDC: SHR     EAX,010h
@@ -801,6 +881,7 @@ NoIDCReg: MOV     DX,OFFSET IDC_Stk
           MOV     [CtxHan],EAX
 NoCtxHook:XOR     EAX,EAX
           RET
+          ALIGN 8
      Err: MOV     EAX,0001h
           RET
 SetOptions ENDP
@@ -815,7 +896,7 @@ SetOptions ENDP
   ; Strategy code routine is called by kernel.
   ; ES:BX = request packet address
   ; all Registers saved
-
+          ALIGN 16
   Strat   PROC    FAR             ; Strategy entry point
           MOV     DI,ES:[BX+2]    ; get command code from packet
           AND     DI,0FFh
@@ -823,23 +904,13 @@ SetOptions ENDP
           JLE     Strat1          ; jump if command code OK
           CALL    Error           ; bad command code
           JMP     Strat2
+          ALIGN   8
   Strat1: ADD     DI,DI           ; branch to command code routine
           CALL    WORD PTR [DI+Dispch] ; call appropriate
   Strat2: RET                     ; back to OS/2 kernel
   Strat   ENDP
 
-; Context1 PROC    FAR             ; primary context hook entry point
-;          PUSHAD                  ; save all
-;          MOV     SI,0
-;          JMP     Context
-; Context1 ENDP
-
-; Context2 PROC    FAR             ; secondary context hook entry point
-;          PUSHAD                  ; save all
-;          MOV     SI,4
-;          JMP     Context
-; Context2 ENDP
-
+          ALIGN 16
   Context PROC    FAR             ; Context hook general
           PUSHAD
           PUSH    ES
@@ -877,6 +948,7 @@ SetOptions ENDP
           RET                       ; back to OS/2 kernel
   Context ENDP
 
+          ALIGN 16
   IDC_Stk PROC    FAR C  @@offset,@@selector
           PUSHFD
           PUSHAD
@@ -898,15 +970,19 @@ SetOptions ENDP
           ADD     ECX,EBX         ; build FLAT address
           MOV     ESI,ECX
           CALL    IDC_Main
+          MOV     SS:[ESP+022h],EAX ;patch StackEAX to EAX
+          SHR     EAX,010h        ; C-Style callers need MSB of Error Code in DX
+          MOV     SS:[ESP+01Ah],EAX ;patch StackEDX to EAX (High Bytes]
    IFail: POP     GS              ; cleanup
           POP     ES
           POP     DS
           POPAD
           POPFD
-          XOR     AX,AX
+          AND   EAX,0FFFFh        ; mask MSB
           RET
   IDC_Stk ENDP
 
+          ALIGN 16
   IDC_Reg PROC    FAR
           PUSHFD
           PUSHAD                   ; save Regs
@@ -918,7 +994,7 @@ SetOptions ENDP
           MOV     AX,SEG _DATA
           MOV     DS,AX
           MOV     AX,ES            ; get info about given segment in ES
-          MOV     DI,AX           ; keep 16:16 pointer in EDI
+          MOV     DI,AX            ; keep 16:16 pointer in EDI
           SHL     EDI,010h
           MOV     DI,BX
           CALL    GetSelInf
@@ -927,15 +1003,17 @@ SetOptions ENDP
           ADD     ECX,EBX          ; build FLAT address
           MOV     ESI,ECX
           CALL    IDC_Main
+          MOV     SS:[ESP+022h],EAX ;patch StackEAX to EAX
    IFail: POP     GS               ; cleanup
           POP     ES
           POP     DS
           POPAD
           POPFD
-          XOR     AX,AX
+          AND   EAX,0FFFFh
           RET
   IDC_Reg ENDP
 
+          ALIGN 16
  IDC_None PROC    FAR
           PUSHFD
           PUSHAD                   ; save Regs
@@ -949,21 +1027,24 @@ SetOptions ENDP
           XOR     ESI,ESI          ; data is NULL pointer
           XOR     EDI,EDI
           CALL    IDC_Main
+          MOV     SS:[ESP+022h],EAX ;patch StackEAX to EAX
    IFail: POP     GS               ; cleanup
           POP     ES
           POP     DS
           POPAD
           POPFD
-          XOR     EAX,EAX
+          AND   EAX,0FFFFh
           RET
  IDC_None ENDP
 
+          ALIGN 16
  IDC_Main PROC    NEAR
           MOV     AX,SEG FLAT:DATA32 ; prepare AX to give Data-selector
           CALL    DS:[IDCCode]    ; call Strat
           RET
  IDC_Main ENDP
 
+          ALIGN 16
   Intr    PROC    FAR               ; driver Interrupt handler
           MOV     AX,SEG _DATA      ; make shure DS is pointing to _DATA
           MOV     DS,AX
@@ -980,10 +1061,12 @@ SetOptions ENDP
           CALL    [DevHlp]        ; send EOI
           CLC                     ; signal we owned interrupt
           RET                     ; return from interrupt
+          ALIGN 8
 NotReady: STC                     ; signal we didn't owned interrupt
           RET                     ; return
   Intr    ENDP
 
+          ALIGN 16
   Timer   PROC    FAR             ; driver timer call handler
           PUSHFD
           PUSHAD                  ; save all
@@ -1010,35 +1093,42 @@ NotReady: STC                     ; signal we didn't owned interrupt
 ;
 ;##############################################################
 
-
+          ALIGN 16
  MACCall0 PROC    FAR
           MOV     EAX,0           ;store func number
           JMP     MACCall
  MACCall0 ENDP
+          ALIGN 4
  MACCall1 PROC    FAR
           MOV     EAX,1           ;store func number
           JMP     MACCall
  MACCall1 ENDP
+          ALIGN 4
  MACCall2 PROC    FAR
           MOV     EAX,2           ;store func number
           JMP     MACCall
  MACCall2 ENDP
+          ALIGN 4
  MACCall3 PROC    FAR
           MOV     EAX,3           ;store func number
           JMP     MACCall
  MACCall3 ENDP
+          ALIGN 4
  MACCall4 PROC    FAR
           MOV     EAX,4           ;store func number
           JMP     MACCall
  MACCall4 ENDP
+          ALIGN 4
  MACCall5 PROC    FAR
           MOV     EAX,5           ;store func number
           JMP     MACCall
  MACCall5 ENDP
+          ALIGN 4
  MACCall6 PROC    FAR
           MOV     EAX,6           ;store func number
           JMP     MACCall
  MACCall6 ENDP
+          ALIGN 16
  MACCall  PROC    FAR
           SHL     EAX,010h
           MOV     AX,SP
@@ -1071,30 +1161,37 @@ NotReady: STC                     ; signal we didn't owned interrupt
           JA      Ret2
           SHR     EAX,010h
           RET
+          ALIGN 4
     Ret2: CMP     AX,2
           JA      Ret4
           SHR     EAX,010h
           RET 2
+          ALIGN 4
     Ret4: CMP     AX,4
           JA      Ret6
           SHR     EAX,010h
           RET 4
+          ALIGN 4
     Ret6: CMP     AX,6
           JA      Ret8
           SHR     EAX,010h
           RET 6
+          ALIGN 4
     Ret8: CMP     AX,8
           JA      RetA
           SHR     EAX,010h
           RET 8
+          ALIGN 4
     RetA: CMP     AX,0Ah
           JA      RetC
           SHR     EAX,010h
           RET 0Ah
+          ALIGN 4
     RetC: CMP     AX,0Ch
           JA      RetE
           SHR     EAX,010h
           RET 0Ch
+          ALIGN 4
     RetE: SHR     EAX,010h
           RET 0Eh
  MACCall  ENDP
@@ -1115,6 +1212,7 @@ NotReady: STC                     ; signal we didn't owned interrupt
   ; 81xxH if 'done' and error detected (xx=error code)
   ; Status has to be set in PASCAL
 
+          ALIGN 16
   CallStr PROC    NEAR
           MOV     ECX,ES:[BX+05h] ; save Reserved
           PUSH    ECX
@@ -1138,6 +1236,7 @@ NotReady: STC                     ; signal we didn't owned interrupt
           POP     ECX
           MOV     ES:[BX+05h],ECX ; restore reserved
           RET
+          ALIGN 16
    Ring0: MOV     AX,SEG FLAT:_DATA ; for some functions to work
           MOV     GS,AX             ; we need FLAT Data Selector in GS
           MOV     AX,ES           ; load ES selector in AX
@@ -1156,12 +1255,14 @@ NotReady: STC                     ; signal we didn't owned interrupt
           POP     ECX
           MOV     ES:[BX+05h],ECX ; restore reserved
           RET
+          ALIGN 8
    CFail: POP     BX              ; stack cleanup
           POP     ECX
           MOV     ES:[BX+05h],ECX ; restore reserved
           JMP     Error           ; signal error
   CallStr ENDP
 
+          ALIGN 8
   Error   PROC    NEAR            ; bad command code
           MOV     AX,8103h        ; error bit and 'done' status + "Unknown Command" code
           MOV     ES:[BX+3],AX    ; status into request packet
@@ -1176,6 +1277,7 @@ NotReady: STC                     ; signal we didn't owned interrupt
   ; -cleanup afer PASCAL has run
   ; USES: ALL Registers except BX,ES are saved
 
+          ALIGN 16
   DosIO   PROC    NEAR            ; convert given PhysAddr to FLAT
           MOV     AX,SEG FLAT:_DATA ; for some functions to work
           MOV     GS,AX           ; we need FLAT Data Selector in GS
@@ -1200,6 +1302,7 @@ NotReady: STC                     ; signal we didn't owned interrupt
           POP     EAX
           MOV     ES:[BX+0Eh],EAX ; restore Physical Address
           RET
+          ALIGN 8
    DFail: POP     BX
           POP     ES
           POP     EAX
@@ -1211,6 +1314,7 @@ NotReady: STC                     ; signal we didn't owned interrupt
   ; -Call PASCAL
   ; USES: ALL Registers except BX,ES are saved
 
+          ALIGN 16
   IOCtl   PROC    NEAR
           MOV     AX,SEG FLAT:_DATA ; for some functions to work
           MOV     GS,AX           ; we need FLAT Data Selector in GS
@@ -1254,6 +1358,7 @@ DataLenOK:MOV     DX,0027h
   ; -cleanup afer PASCAL has run
   ; USES: ALL Registers except BX,ES are saved
 
+          ALIGN 16
   Init    PROC    NEAR            ; function 0 = initialize
           MOV     AX,ES:[BX+14]   ; get DevHlp entry point
           MOV     WORD PTR DevHlp,AX
@@ -1350,6 +1455,7 @@ DataLenOK:MOV     DX,0027h
           MOV     WORD PTR ES:[BX+14],OFFSET _TEXT:Init   ; reserve till begin of Init
           MOV     WORD PTR ES:[BX+16],OFFSET DGROUP1:errm ; reserve till beginn of errm
           RET
+          ALIGN 8
    Fail1: POP     ES                      ;cleanup stack
           POP     BX
    Fail2: MOV     WORD PTR ES:[BX+14],0 ;no code needed
@@ -1375,6 +1481,7 @@ DataLenOK:MOV     DX,0027h
           RET
   Init    ENDP
 
+          ALIGN 16
 PrintMSG  PROC    NEAR
           MOV     EBX,[info]
           AND     EBX,0FFF8FFFFh
@@ -1458,12 +1565,12 @@ CtxThSt2  ENDP
 
 CtxThMain PROC NEAR
           DB    0bdh            ; MOV EBP, BaseAddr
-CtxThM_A1 DD    00h             ; this is patched to linear Base Addr by CteateThread
+CtxThM_A1 DD    00h             ; this is patched to linear Base Addr by CreateThread
           MOV   EAX,EBP         ; store Base Addr
           MOV   [EBP],EAX
           POP   EBX             ; get PrioClass
           PUSH  00h             ; this thread
-          PUSH  010h            ; delta +16
+          PUSH  01Fh            ; delta +31
           PUSH  EBX             ; Prio Class
           PUSH  02h             ; PRTYS_THREAD
           MOV   EAX,OFFSET CtxThPrio-CtxThBase
@@ -1479,6 +1586,7 @@ CtxThM_A1 DD    00h             ; this is patched to linear Base Addr by CteateT
           CALL  DWORD PTR [EAX] ; Call DosExit
 CtxThMain ENDP
 
+
 ;################################################################
 ;
 ;         CallGate Entry Point to Ring0
@@ -1489,6 +1597,7 @@ CtxThMain ENDP
   ; if packet address is null, call is context thread
   ; Segment Registers are kept by CallGate
 
+          ALIGN 4
   PrepGDT PROC FAR                ; here we are at ring 0
           MOV   AX,SEG FLAT:_DATA ; get flat data descriptor
           MOV   DS,AX             ; set DS FLAT
@@ -1521,6 +1630,7 @@ CtxThMain ENDP
   ; If ESI=0 then call is a context-hook call.
   ; In that case EDI contains given Param of EAX from activation
 
+          ALIGN 4
  CallS32  PROC  FAR
           MOV   DS,AX             ; set DS FLAT
           MOV   ES,AX             ; set ES FLAT
@@ -1538,6 +1648,7 @@ ContextH: MOV   EAX,01h
           RET                     ; status is set in packet
  CallS32  ENDP
 
+          ALIGN 4
  CallI32  PROC  FAR
           MOV   DS,AX             ; set DS FLAT
           MOV   ES,AX             ; set ES FLAT
@@ -1546,6 +1657,7 @@ ContextH: MOV   EAX,01h
           RET                     ; status is set in packet
  CallI32  ENDP
 
+          ALIGN 4
  CallD32  PROC  FAR
           MOV   DS,AX             ; set DS FLAT
           MOV   ES,AX             ; set ES FLAT
@@ -1572,6 +1684,7 @@ ContextH: MOV   EAX,01h
 ;
 ;##################################################################
 
+          ALIGN 4
 DRVBASE@DevHlp32 PROC  NEAR       ; 32-bit part for calling devhlp
           PUSH  DS                ; push flat DS on stack
           PUSH  ES                ; push flat ES on stack
@@ -1579,21 +1692,26 @@ DRVBASE@DevHlp32 PROC  NEAR       ; 32-bit part for calling devhlp
           PUSH  CS                  ; push flat CS on stack
           PUSH  OFFSET DevHlpRt ; push offset for return on stack
           JMP   FAR16 PTR DevHlp16  ; call 16-bit part
+          ALIGN 4
 DevHlpRt: POP   EBP                 ; get back EBP
           POP   ES                  ; get FLAT ES
           POP   DS                  ; get FLAT DS
           RET
 DRVBASE@DevHlp32 ENDP
 
+          ALIGN 4
 DRVBASE@GetGDTSelInf32 PROC  NEAR
           PUSH    ESI
           MOVZX   ESI,AX            ; get Selector in ESI
           MOV     EDX,OFFSET GDT_Base ; load GDT regs at GDT_Base
-          CMP     DWORD PTR [EDX+2],0h
-          JA      GDT_Ok
+          MOV     CX,-1             ; acquire lock
+    WAIT: XCHG    CX,[EDX+6]
+          OR      CX,CX
+          JNZ     WAIT
           SGDT    [EDX]
-  GDT_Ok: AND     ESI,0000FFF8h     ; mask RPL (for security)
+          AND     ESI,0000FFF8h     ; mask RPL (for security)
           ADD     ESI,[EDX+2]       ; build address of Selector in GDT
+          MOV     DWORD PTR [EDX+6],0 ;free Lock
           MOV     EDX,GS:[ESI+2]    ; load lower Base in EDX
           AND     EDX,000FFFFFFh
           MOV     ECX,GS:[ESI+4]    ; load higher Base in ECX
@@ -1605,6 +1723,7 @@ DRVBASE@GetGDTSelInf32 PROC  NEAR
           RET
 DRVBASE@GetGDTSelInf32 ENDP
 
+          ALIGN 4
 DRVBASE@DevYield  PROC  NEAR
           MOV     AX,CS
           AND     AX,03h            ; check if Ring 0
@@ -1629,11 +1748,13 @@ DRVBASE@DevYield  PROC  NEAR
           CALL    DRVBASE@DevHlp32
           XOR     EAX,EAX           ; signal success
           RET
+          ALIGN 4
      Err: POP     EBX
    Leave: MOV     EAX,01            ; signal not done
           RET
 DRVBASE@DevYield  ENDP
 
+          ALIGN 4
 DRVBASE@DevTCYield  PROC  NEAR
           MOV     AX,CS
           AND     AX,03h            ; check if Ring 0
@@ -1658,6 +1779,7 @@ DRVBASE@DevTCYield  PROC  NEAR
           CALL    DRVBASE@DevHlp32
           XOR     EAX,EAX           ; signal success
           RET
+          ALIGN 4
      Err: POP     EBX
    Leave: MOV     EAX,01            ; signal not done
           RET
@@ -1665,14 +1787,14 @@ DRVBASE@DevTCYield  ENDP
 
 DRVBASE@LocToDat32 PROC NEAR
           MOV     EAX,[ESP+4]
-          MOV     EDX,OFFSET PTKSSBase
-          MOV     EDX,[EDX]         ; get PTKSSBase
+          MOV     EDX,[PTKSSBase]    ; get PTKSSBase
           CMP     EAX,[EDX]
           JAE     Ready
           ADD     EAX,[EDX]
   Ready:  RET 4
 DRVBASE@LocToDat32 ENDP
 
+          ALIGN 4
 DRVBASE@DevSleep PROC  NEAR
           PUSH    EBX
           PUSH    EDI
@@ -1697,6 +1819,7 @@ DRVBASE@DevSleep ENDP
 
 ; now call DOS32CREATETHREAD to add the Context Threads to Process1 (Kernel)
 
+          ALIGN 4
 InitContextThread PROC NEAR
           MOV   ESI,OFFSET CtxMask; get Mask
           MOV   EAX,[ESI]         ; test if any Threads to create
@@ -1747,6 +1870,7 @@ InitContextThread ENDP
 
 ; ESI has Offset to Data Structures (04=1st / 08=2nd Thread)
 
+          ALIGN 4
 CreateContextThread PROC NEAR
           PUSH  EBP             ; necessary else Stack gets corrupted by DosCall
           MOV   EBP,ESP
@@ -1767,6 +1891,7 @@ CreateContextThread PROC NEAR
           RET
 CreateContextThread ENDP
 
+          ALIGN 4
 RunThread PROC  NEAR
           MOV     ESI,EAX              ; save Hook Number
           MOV     EAX,OFFSET CtxHan
@@ -1774,11 +1899,10 @@ RunThread PROC  NEAR
           MOV     EBX,[EAX+4]          ; look if threads left
           OR      EBX,[EAX+8]
           JNZ     ThLeft
-          MOV     EAX,OFFSET CtxThBase ; get Map Base
-          MOV     EAX,[EAX]
+          MOV     EAX,[CtxThBase] ; get Map Base
           MOV     EDX,058h             ; free Map
           CALL    NEAR32 PTR DRVBASE@DevHlp32
- ThLeft:  MOV     EBX,OFFSET CtxSemP16 ; load all Regs to Request Sem
+   ThLeft:MOV     EBX,OFFSET CtxSemP16 ; load all Regs to Request Sem
           ADD     EBX,ESI
           MOV     EAX,[EBX]
           MOVZX   EBX,AX
@@ -1790,24 +1914,26 @@ RunThread PROC  NEAR
           CALL    NEAR32 PTR DRVBASE@DevHlp32
 OuterLoop:POPAD                        ; get Regs back
           PUSHAD
+          PUSH    ESI                   ; on SMP Kernel, ESI will be destroyed
           CALL    NEAR32 PTR DRVBASE@DevHlp32  ; Request Sem
+          POP     ESI
           MOV     EDX,[CtxReq+ESI]
           LOCK    OR  [CtxRun+ESI],1    ; mark Hook running
           MOV     EAX,EDX               ; get active ReqBits
 InnerLoop:NOT     EAX
           LOCK    AND [CtxReq+ESI],EAX  ; mask Req Bits handled within this call
           LOCK    OR  [CtxRun+ESI],1    ; mark Hook running
-          PUSH    ESI               ; save Offset
+          PUSH    ESI                   ; save Offset
           SHR     ESI,1
-          PUSH    ESI               ; store Hook to pascal
-          PUSH    EDX               ; store Params from ArmCtxHook
+          PUSH    ESI                   ; store Hook to pascal
+          PUSH    EDX                   ; store Params from ArmCtxHook
           CALL    NEAR32 PTR DRVSTUB1@Context
           POP     ESI
           LOCK    AND [CtxRun+ESI],0    ; mark Hook not running
           MOV     EAX,[CtxReq+ESI]      ; look if requests are left
           CMP     EAX,0
-          JNZ     InnerLoop
-          JMP     OuterLoop
+          JNZ     NEAR PTR InnerLoop
+          JMP     NEAR PTR OuterLoop
 RunThread ENDP
 
 CODE32    ENDS

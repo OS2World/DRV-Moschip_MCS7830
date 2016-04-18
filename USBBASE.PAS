@@ -1,5 +1,5 @@
 {$B-,D+,H-,I-,J+,P-,Q-,R-,S-,T-,V+,W-,X+,Z-}
-{&AlignCode-,AlignData-,AlignRec-,Asm-,Cdecl-,Comments-,Delphi-,Frame+,G5+}
+{&AlignCode+,AlignData-,AlignRec-,Asm-,Cdecl-,Comments-,Delphi-,Frame+,G5+}
 {&LocInfo+,Open32-,Optimise+,OrgName-,SmartLink+,Speed+,Use32+,ZD-}
 {$M 32768}
 
@@ -875,8 +875,8 @@ BEGIN
           DevSemClear(Sem16);
         END ELSE
         BEGIN
-          {clear stalled pipe}
-          IF (USBStat AND $40)>0 THEN USBClearStalledPipe(Device,Endpoint);
+          {clear stalled pipe} // NEIN-> Crash beim ausstecken und kein zuverl„ssiger Neustart
+          //IF (USBStat AND $40)>0 THEN USBClearStalledPipe(Device,Endpoint);
           IF LastStat=$0100
             THEN LastLen:=ResultPacket.Buffer1Len
             ELSE LastLen:=0;

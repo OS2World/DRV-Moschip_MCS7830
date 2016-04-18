@@ -21,11 +21,11 @@ CONST
   HEADLINE  ='Moschip MCS7830 USB to ETHERNET Driver';
   FILENAME  ='MCS7830.OS2';
   AUTHOR    ='Holger Veith';
-  DAT_YEAR  = 2011;
-  DAT_MONTH = 03;
-  DAT_DAY   = 21;
+  DAT_YEAR  = 2016;
+  DAT_MONTH = 02;
+  DAT_DAY   = 15;
   VERSION   = 1;
-  SUBVERSION= 3;
+  SUBVERSION= 4;
 
   // Shutdown-Lock eingefÅhrt
   // kein Senden an USB wenn ResetPending, danach aber auf jeden Fall ein ContextCall
@@ -105,6 +105,7 @@ VAR
   GetStatusBuff :ARRAY[0..10] OF UShort;   {may not be local cause Stack corruption on delayed answer}
   Dummy         :PhysPage;
   Shutdown      :Boolean;                  // true if Shutdown is running - no more actions allowed
+
 
 FUNCTION USBRcFrame(IRQ:PUSBIRQINF):Boolean; FORWARD;
 FUNCTION USBTxFrameDone(IRQ:PUSBIRQINF):Boolean; FORWARD;
@@ -843,8 +844,12 @@ BEGIN
         FrLen:=USBGetDataLastLen(Device,IRQ^.EndpointID)-1;
         IF Buff[FrLen]=$20 THEN
         BEGIN
-          {InfAdd('Rc done',NIL);}
-          IF FrLen < MAC^.MinLenLkAh THEN FrLen:=MAC^.MinLenLkAh;
+          //InfAdd('Rc done',NIL);
+          IF FrLen < MAC^.MinLenLkAh THEN
+          BEGIN
+            Buff[FrLen+1]:=0;
+            FrLen:=MAC^.MinLenLkAh;
+          END;
           AData^.RcuBFillCompl:=BIndex;
           AData^.CtxRequest:=AData^.CtxRequest OR CTX_RCUD;
           DevArmCtxHook(CTX_THTC,CTX_RCUD);
@@ -987,6 +992,7 @@ BEGIN
           MemFill(@USB[n],SizeOf(USBDEV),0);
           InfAdd('Cleanup OK'+CR+LF,NIL);
           ResetPending:=False;
+          DevArmCtxHook(CTX_THTC,CTX_SNDS);   {Resquest Transmission, may have been blocked by ResetPending}
           {stop status timer}
           DEC(USBCnt);
           IF USBCnt=0 THEN DevResetTimer;
@@ -1058,7 +1064,7 @@ BEGIN
           {GetMACStatus(BaseAddr,False);}
           IF (MSS.MssStatus AND $7)=7 THEN
           BEGIN
-            {InfAdd('SendFrame started',NIL);}
+            //InfAdd('SendFrame started',NIL);
             SendFrame(BaseAddr,USBLink);
           END;
           CtxRequest:=CtxRequest AND NOT CTX_SNDS;
@@ -1088,6 +1094,7 @@ BEGIN
           WHILE (RcvBFillCompl<>RcvBNextTrns) AND (IndicationCnt=0) DO
           BEGIN
             DevYield;
+            //InfAdd('RCV Indication ',NIL);
             INC (RcvBNextTrns);
             IF RcvBNextTrns>RCVBUFFCNT THEN RcvBNextTrns:=0;
             WITH RcvBuff[RcvBNextTrns] DO
@@ -1115,8 +1122,8 @@ BEGIN
           AData^.IndUSBBuff:=True;
           WHILE (RcuBFillCompl<>RcuBNextTrns) AND (IndicationCnt=0) DO
           BEGIN
-            {InfAdd('RCU Indication ',NIL);}
             DevYield;
+            //InfAdd('RCU Indication ',NIL);
             INC (RcuBNextTrns);
             IF RcuBNextTrns>RCUBUFFCNT THEN RcuBNextTrns:=0;
             WITH RcuBuff[RcuBNextTrns] DO
@@ -1244,6 +1251,7 @@ BEGIN
       BEGIN
         WITH AData^ DO
         BEGIN
+          //InfAdd('XmitChain Called!',NIL);
           FIndex:=SndBNextFill;
           {Set pointer to next Buffer}
           Inc(SndBNextFill);
@@ -1263,6 +1271,7 @@ BEGIN
             END;
             IF rc.RStat<=MAC_QUEUED THEN Status:=MACBFULL ELSE Status:=MACBIDLE;
             XmitStat:=rc.RStat;
+            // loopback needed?
             AddrT:=MACTestFilter(Data,Addr(Buff));
             IF (Status=MACBFULL) AND (AddrT<>MAC_ADDR_NONE) THEN
             WITH AData^ DO
@@ -1293,6 +1302,7 @@ BEGIN
                 END;
               END;
             END;
+
             IF (Status=MACBFULL) AND (XmitStat<=MAC_QUEUED) THEN
             BEGIN
               {prepare USB send procedure}
@@ -1307,8 +1317,8 @@ BEGIN
                   TxStarted:=True;
                   CtxRequest:=CtxRequest OR CTX_SNDS;
                   DevArmCtxHook(CTX_THTC,CTX_SNDS);
-                  {InfAdd('Snd start OK: %%%'+CR+LF,LocToDat32(@Findex,SSOffset));}
-                END {ELSE InfAdd('Snd running OK: %%%'+CR+LF,LocToDat32(@Findex,SSOffset))};
+                  //InfAdd('Snd start OK: %%%'+CR+LF,LocToDat32(@Findex));
+                END;// ELSE InfAdd('Snd running OK: %%%'+CR+LF,LocToDat32(@Findex));
               END;
               INC(Data^.MSS.MssFS);
               INC(Data^.MSS.MssFSByt,USBGetDataLastLen(USBData,2));
@@ -1329,7 +1339,7 @@ BEGIN
             IF AData^.SndBNextFill>=1
                 THEN Dec(AData^.SndBNextFill)
                 ELSE AData^.SndBNextFill:=SNDBUFFCNT;
-            {InfAdd('SndFillOutRes: %%%'+CR+LF,LocToDat32(@FIndex,SSOffset));}
+            InfAdd('SndFillOutRes: %%%'+CR+LF,LocToDat32(@FIndex));
           END;
           XmitChain.RStat:=XmitStat;
         END;
